@@ -54,7 +54,10 @@ docker-compose exec api pytest -vvv --pycodestyle .
  from my TODO list, I think the challenge is a good moment to learn it.
     * Modeling objects with Pydantic.
     * OpenAPI documentation, auto-generated.
+    * The API of events is created inside of APIRoute. Looking cleaning and easy versions.
+    * Add the parameter offline to GET.
 * PyTest and TestClient for easy e2e tests.
+    * Using mock in tests with external connections.
 * For schemas:
     - consider all parameters required except 'organizer_company_id' in BaseEvent.
     - zone is a list in Event.
@@ -63,4 +66,5 @@ docker-compose exec api pytest -vvv --pycodestyle .
     - Add the URL like a environment variable for easy change. 
     - Read data from URL and parse with library 'xmltodict'.
     - I need to rename some fields after xmltodict.
-* Check PEP8 with pycodestyle
+* Check PEP8 with pycodestyle.
+* The module Events working with events models.

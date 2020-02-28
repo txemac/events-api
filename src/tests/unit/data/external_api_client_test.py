@@ -2,8 +2,7 @@ from data.external_api_client import ExternalAPIClient
 from tests.utils import assert_dicts
 
 
-def test_get_base_events(mocker, xml, events):
-    mocked_requests_get = mocker.patch('requests.get')
+def test_get_base_events(mocked_requests_get, xml, events):
     mocked_requests_get.return_value.text = xml
     assert ExternalAPIClient.get_base_events() == events
 
@@ -15,7 +14,7 @@ def test__parse_text_to_base_events(xml, events):
     assert result == events
 
 
-def test__text_to_dict(xml, dicts):
+def test__xml_to_dict(xml, dicts):
     result = ExternalAPIClient._xml_to_dict(xml=xml)['eventList']['output']['base_event']
     assert isinstance(result, list)
     assert result == dicts

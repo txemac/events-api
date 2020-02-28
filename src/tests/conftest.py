@@ -215,3 +215,8 @@ def event_3(dict_3):
 @pytest.fixture
 def events(event_1, event_2, event_3):
     return [event_1, event_2, event_3]
+
+
+@pytest.fixture
+def mocked_requests_get(mocker):
+    return mocker.patch('requests.get')

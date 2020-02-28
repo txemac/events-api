@@ -48,7 +48,7 @@ class ExternalAPIClient:
         """
         Parse xml text to a dictionary.
 
-        :param str xml: text
+        :param str xml: xml
         :return Dict: dictionary
         """
         aux = dict(xmltodict.parse(xml))
