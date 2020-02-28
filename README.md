@@ -68,3 +68,8 @@ docker-compose exec api pytest -vvv --pycodestyle .
     - I need to rename some fields after xmltodict.
 * Check PEP8 with pycodestyle.
 * The module Events working with events models.
+
+
+## Future tasks
+* Pagination in GET response, check https://fastapi-contrib.readthedocs.io/en/latest/fastapi_contrib.html#module-fastapi_contrib.pagination
+* Study the option to create a local database if the events only change 1 time per day.
