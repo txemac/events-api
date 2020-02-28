@@ -28,3 +28,28 @@ assumptions you have made
 - Think about this project as a long-term project for the future and how it will scale (add on the README.md the desitions you have made because of this)
 
 If you have any questions about the test you can contact us
+
+
+## Run
+```shell script
+docker-compose up -d --build
+```
+
+Check the API with http://127.0.0.1:8000/_health
+
+
+## Documentation
+
+http://127.0.0.1:8000/docs or http://127.0.0.1:8000/redoc
+
+## Tests
+```shell script
+docker-compose exec api pytest -vvv .
+```
+
+
+## Considerations
+* Using Docker for a project scalable desired to the future.
+* API created with [FastAPI](https://fastapi.tiangolo.com), it is a new microframework for me, and I rescue it
+ from my TODO list, I think the challenge is a good moment to learn it.
+* PyTest and TestClient for easy e2e tests.
