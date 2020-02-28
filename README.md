@@ -10,7 +10,7 @@ On this project we will evaluate:
 - How the idea matches the given problem
 - The software architecture
 
-### Description
+### Description
 We have an external company that provides us with different events that we fetch, this endpoint
 changes every day, providing the new events for the future and removing the old ones.
 The main purpose of the application to develop is to provide a HTTP endpoint to query the different events. This endpoint should accept a "start_date" and a "end_date" param, and return only the events within this time range.
