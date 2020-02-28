@@ -44,7 +44,7 @@ http://127.0.0.1:8000/docs or http://127.0.0.1:8000/redoc
 
 ## Tests
 ```shell script
-docker-compose exec api pytest -vvv .
+docker-compose exec api pytest -vvv --pycodestyle .
 ```
 
 
@@ -63,3 +63,4 @@ docker-compose exec api pytest -vvv .
     - Add the URL like a environment variable for easy change. 
     - Read data from URL and parse with library 'xmltodict'.
     - I need to rename some fields after xmltodict.
+* Check PEP8 with pycodestyle
