@@ -30,22 +30,32 @@ assumptions you have made
 If you have any questions about the test you can contact us
 
 
-## Run
+## Commands
+* Run:
 ```shell script
-docker-compose up -d --build
+make run
 ```
 
 Check the API with http://127.0.0.1:8000/_health
 
+* Tests:
+```shell script
+make tests
+```
+
+* Stop:
+```shell script
+make stop
+```
+
+* Delete:
+```shell script
+make rm
+```
 
 ## Documentation
 
 http://127.0.0.1:8000/docs or http://127.0.0.1:8000/redoc
-
-## Tests
-```shell script
-docker-compose exec api pytest -vvv --pycodestyle .
-```
 
 
 ## Considerations
