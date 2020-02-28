@@ -59,3 +59,7 @@ docker-compose exec api pytest -vvv .
     - consider all parameters required except 'organizer_company_id' in BaseEvent.
     - zone is a list in Event.
     - only 1 Event inside of BaseEvent.
+* Create an external API client, with the logic necessary to read and parse to internal models.
+    - Add the URL like a environment variable for easy change. 
+    - Read data from URL and parse with library 'xmltodict'.
+    - I need to rename some fields after xmltodict.

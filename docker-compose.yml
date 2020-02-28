@@ -8,3 +8,5 @@ services:
       - ./src/:/usr/src/app/
     ports:
       - 8000:8000
+    environment:
+      EXTERNAL_API_URL: "https://gist.githubusercontent.com/miguelgf/2885fe812638bfb33f785a977f8b7e3c/raw/0bef14cee7d8beb07ec9dabd6b009499f65b85f0/response.xml"
