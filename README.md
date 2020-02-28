@@ -52,4 +52,10 @@ docker-compose exec api pytest -vvv .
 * Using Docker for a project scalable desired to the future.
 * API created with [FastAPI](https://fastapi.tiangolo.com), it is a new microframework for me, and I rescue it
  from my TODO list, I think the challenge is a good moment to learn it.
+    * Modeling objects with Pydantic.
+    * OpenAPI documentation, auto-generated.
 * PyTest and TestClient for easy e2e tests.
+* For schemas:
+    - consider all parameters required except 'organizer_company_id' in BaseEvent.
+    - zone is a list in Event.
+    - only 1 Event inside of BaseEvent.
