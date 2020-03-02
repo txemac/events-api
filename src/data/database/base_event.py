@@ -1,4 +1,7 @@
+from datetime import date
 from datetime import datetime
+from typing import List
+from typing import Optional
 
 from sqlalchemy import Column
 from sqlalchemy import DateTime
@@ -127,3 +130,34 @@ class BaseEvent(Base):
             base_event_db = cls._update(db_session=db_session, base_event_db=base_event_db, data=base_event)
 
         return base_event_db
+
+    @staticmethod
+    def get_events(
+            db_session: Session,
+            start_date: Optional[date] = None,
+            end_date: Optional[date] = None,
+            offline: Optional[bool] = False,
+    ) -> List[BaseEventDB]:
+        """
+        Get event from database.
+
+        :param Session db_session: database session
+        :param date start_date: start date
+        :param date end_date: end date
+        :param bool offline: filter offline
+        :return List: base events
+        """
+        result = db_session.query(BaseEvent)
+
+        if start_date is not None:
+            start_datetime = datetime.combine(start_date, datetime.min.time())
+            result = result.filter(BaseEvent.event.has(Event.event_date >= start_datetime))
+
+        if end_date is not None:
+            end_datetime = datetime.combine(end_date, datetime.max.time())
+            result = result.filter(BaseEvent.event.has(Event.event_date <= end_datetime))
+
+        if offline is False:
+            result = result.filter(BaseEvent.sell_mode == 'online')
+
+        return result.all()

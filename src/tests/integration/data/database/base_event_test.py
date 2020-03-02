@@ -1,5 +1,7 @@
 from datetime import datetime
 
+import pytest
+
 from data.database import Zone
 from data.database.base_event import BaseEvent
 from data.database.event import Event
@@ -37,3 +39,27 @@ def test_create(session, data_base_event):
     assert base_event_db.event.zone[0].capacity == data_base_event['event']['zone'][0]['capacity']
     assert base_event_db.event.zone[0].max_price == data_base_event['event']['zone'][0]['max_price']
     assert base_event_db.event.zone[0].numbered is data_base_event['event']['zone'][0]['numbered']
+
+
+def test_get_events_empty(session):
+    assert BaseEvent.get_events(db_session=session) == []
+
+
+@pytest.mark.parametrize('offline, expected',
+                         [(True, 3),
+                          (False, 2)])
+def test_get_events_offline(session, scenario, offline, expected):
+    assert len(BaseEvent.get_events(db_session=session, offline=offline)) == expected
+
+
+@pytest.mark.parametrize('start_date, end_date, expected',
+                         [('1982-04-25', '1983-04-25', 0),
+                          ('2019-06-30', '2019-06-30', 1),
+                          ('2019-04-21', '2019-04-23', 0),
+                          ('2019-07-29', '2019-08-01', 1),
+                          ('2019-06-30', '2019-08-30', 2),
+                          ('2019-03-30', '2019-09-30', 2)])
+def test_get_events_date_range(session, scenario, start_date, end_date, expected):
+    start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+    end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+    assert len(BaseEvent.get_events(db_session=session, start_date=start_date, end_date=end_date)) == expected
