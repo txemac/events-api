@@ -5,12 +5,18 @@ from data.schemas import ZoneCreate
 def test__create(session, data_zone):
     count1 = session.query(Zone).count()
     data = ZoneCreate(**data_zone)
-    Zone._create(
+    zone = Zone._create(
         db_session=session,
         data=data,
     )
     count2 = session.query(Zone).count()
     assert count1 + 1 == count2
+
+    assert zone.zone_id == data_zone['zone_id']
+    assert zone.name == data_zone['name']
+    assert zone.capacity == data_zone['capacity']
+    assert zone.max_price == data_zone['max_price']
+    assert zone.numbered is data_zone['numbered']
 
 
 def test__get_by_id_ok(session, new_zone):

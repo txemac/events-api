@@ -11,6 +11,7 @@ from starlette.testclient import TestClient
 from app.main import app
 from data import external_api_client
 from data.database import Base
+from data.database import Event
 from data.database import get_db
 from data.database.zone import Zone
 from data.schemas import BaseEventCreate
@@ -83,9 +84,17 @@ def new_zone_create(data_zone):
 
 @pytest.fixture
 def new_zone(session, new_zone_create):
-    return Zone._create(
+    return Zone.get_or_create(
         db_session=session,
-        data=new_zone_create,
+        zone=new_zone_create,
+    )
+
+
+@pytest.fixture
+def data_event_zone(new_event, new_zone):
+    return dict(
+        event_id=new_event.event_id,
+        zone_id=new_zone.zone_id,
     )
 
 
@@ -102,9 +111,17 @@ def data_event(data_zone):
 
 
 @pytest.fixture
-def new_event(data_event):
+def new_event_create(data_event):
     return EventCreate(
         **data_event
+    )
+
+
+@pytest.fixture
+def new_event(session, new_event_create):
+    return Event.get_or_create(
+        db_session=session,
+        event=new_event_create,
     )
 
 

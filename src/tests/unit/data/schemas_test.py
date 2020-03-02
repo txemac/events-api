@@ -5,6 +5,7 @@ from pydantic import ValidationError
 
 from data.schemas import BaseEventCreate
 from data.schemas import EventCreate
+from data.schemas import EventDB
 from data.schemas import ZoneCreate
 from data.schemas import ZoneDB
 
@@ -102,13 +103,20 @@ def test_event_create_wrong_date(data_event, value, attr):
         ZoneCreate(**data_event)
 
 
-def test_base_event_ok(new_event):
+def test_event_db(data_event):
+    assert EventDB(
+        dt_created=datetime.now(),
+        **data_event,
+    )
+
+
+def test_base_event_ok(new_event_create):
     assert BaseEventCreate(
         base_event_id=1,
         sell_mode='offline',
         title='Test',
         organizer_company_id=12,
-        event=new_event,
+        event=new_event_create,
     ) is not None
 
 

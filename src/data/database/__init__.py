@@ -18,3 +18,8 @@ def get_db() -> SessionLocal:
         yield db
     finally:
         db.close()
+
+
+from .zone import Zone
+from .event import Event
+from .event_zone import EventZone

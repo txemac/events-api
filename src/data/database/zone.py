@@ -41,12 +41,13 @@ class Zone(Base):
             cls,
             db_session: Session,
             data: ZoneCreate
-    ):
+    ) -> ZoneDB:
         """
         Create a new zone.
 
         :param Session db_session: database session
-        :param UserPost data: data
+        :param Zone data: data
+        :return ZoneDB: zone
         """
         zone = cls(
             zone_id=data.zone_id,

@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import List
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -25,9 +26,13 @@ class EventCreate(BaseModel):
     zone: List[ZoneCreate]
 
 
+class EventDB(EventCreate):
+    dt_created = datetime
+
+
 class BaseEventCreate(BaseModel):
     base_event_id: int
     sell_mode: str
     title: str
-    organizer_company_id: int = None
+    organizer_company_id: Optional[int] = None
     event: EventCreate
