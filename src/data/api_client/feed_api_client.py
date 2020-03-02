@@ -13,7 +13,7 @@ External API client
 """
 
 
-def get_base_events() -> List[BaseEventCreate]:
+def get_feed() -> List[BaseEventCreate]:
     """
     Get info about events from external API.
 
