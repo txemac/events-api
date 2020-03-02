@@ -12,6 +12,10 @@ class Zone(BaseModel):
     numbered: bool
 
 
+class ZoneDB(Zone):
+    dt_created = datetime
+
+
 class Event(BaseModel):
     event_id: int
     event_date: datetime
