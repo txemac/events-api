@@ -18,11 +18,11 @@ class Event(Base):
     __tablename__ = "event"
 
     event_id = Column(Integer, primary_key=True, autoincrement=True, index=True)
-    event_date = Column(DateTime, default=func.now(), nullable=False)
-    sell_from = Column(DateTime, default=func.now(), nullable=False)
-    sell_to = Column(DateTime, default=func.now(), nullable=False)
+    event_date = Column(DateTime, nullable=False)
+    sell_from = Column(DateTime, nullable=False)
+    sell_to = Column(DateTime, nullable=False)
     sold_out = Column(Boolean, nullable=False)
-    zone = relationship(Zone, secondary='event_zone', lazy="joined")
+    zone = relationship(Zone, secondary='event_zone')
     dt_created = Column(DateTime, default=func.now(), nullable=False)
 
     def __init__(
@@ -46,7 +46,7 @@ class Event(Base):
             cls,
             db_session: Session,
             data: EventCreate
-    ):
+    ) -> EventDB:
         """
         Create a new event.
 
@@ -59,13 +59,40 @@ class Event(Base):
             sell_from=data.sell_from,
             sell_to=data.sell_to,
             sold_out=data.sold_out,
-            zone=[Zone.get_or_create(db_session=db_session, zone=z) for z in data.zone],
+            zone=[Zone.create_or_update(db_session=db_session, zone=z) for z in data.zone],
         )
         db_session.add(event)
         db_session.commit()
         db_session.refresh(event)
 
-        return cls._get_by_id(db_session=db_session, event_id=data.event_id)
+        return event
+
+    @classmethod
+    def _update(
+            cls,
+            db_session: Session,
+            event_db: EventDB,
+            data: EventCreate,
+    ) -> EventDB:
+        """
+        Update an event.
+
+        :param Session db_session: database session
+        :param EventDB event_db: event from DB
+        :param EventCreate data: data
+        """
+        event_db.event_id = data.event_id
+        event_db.event_date = data.event_date
+        event_db.sell_from = data.sell_from
+        event_db.sell_to = data.sell_to
+        event_db.sold_out = data.sold_out
+        event_db.zone = [Zone.create_or_update(db_session=db_session, zone=z) for z in data.zone]
+        event_db.dt_created = datetime.now()
+
+        db_session.commit()
+        db_session.refresh(event_db)
+
+        return event_db
 
     @classmethod
     def _get_by_id(
@@ -83,13 +110,13 @@ class Event(Base):
         return db_session.query(cls).get(event_id)
 
     @classmethod
-    def get_or_create(
+    def create_or_update(
             cls,
             db_session: Session,
             event: EventCreate,
     ) -> EventDB:
         """
-        Get an event. Create if it does not exists.
+        Create an event. Update if already exists.
 
         :param Session db_session: database session
         :param EventCreate event: event
@@ -98,4 +125,6 @@ class Event(Base):
         event_db = cls._get_by_id(db_session=db_session, event_id=event.event_id)
         if event_db is None:
             event_db = cls._create(db_session=db_session, data=event)
+        else:
+            event_db = cls._update(db_session=db_session, event_db=event_db, data=event)
         return event_db

@@ -16,6 +16,9 @@ class ZoneCreate(BaseModel):
 class ZoneDB(ZoneCreate):
     dt_created = datetime
 
+    class Config:
+        orm_mode = True
+
 
 class EventCreate(BaseModel):
     event_id: int
@@ -23,11 +26,14 @@ class EventCreate(BaseModel):
     sell_from: datetime
     sell_to: datetime
     sold_out: bool
-    zone: List[ZoneCreate]
+    zone: List[ZoneDB]
 
 
 class EventDB(EventCreate):
     dt_created = datetime
+
+    class Config:
+        orm_mode = True
 
 
 class BaseEventCreate(BaseModel):
@@ -35,8 +41,11 @@ class BaseEventCreate(BaseModel):
     sell_mode: str
     title: str
     organizer_company_id: Optional[int] = None
-    event: EventCreate
+    event: EventDB
 
 
 class BaseEventDB(BaseEventCreate):
     dt_created = datetime
+
+    class Config:
+        orm_mode = True

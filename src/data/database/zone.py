@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import DateTime
@@ -60,7 +62,34 @@ class Zone(Base):
         db_session.commit()
         db_session.refresh(zone)
 
-        return cls._get_by_id(db_session=db_session, zone_id=data.zone_id)
+        return zone
+
+    @classmethod
+    def _update(
+            cls,
+            db_session: Session,
+            zone_db: ZoneDB,
+            data: ZoneCreate,
+    ) -> ZoneDB:
+        """
+        Create a new zone.
+
+        :param Session db_session: database session
+        :param zone_db: data at DB
+        :param Zone data: data
+        :return ZoneDB: zone
+        """
+        zone_db.zone_id = data.zone_id
+        zone_db.name = data.name
+        zone_db.capacity = data.capacity
+        zone_db.max_price = data.max_price
+        zone_db.numbered = data.numbered
+        zone_db.dt_created = datetime.now()
+
+        db_session.commit()
+        db_session.refresh(zone_db)
+
+        return zone_db
 
     @classmethod
     def _get_by_id(
@@ -78,13 +107,13 @@ class Zone(Base):
         return db_session.query(cls).get(zone_id)
 
     @classmethod
-    def get_or_create(
+    def create_or_update(
             cls,
             db_session: Session,
             zone: ZoneCreate,
     ) -> ZoneDB:
         """
-        Get a zone. Create if it does not exists.
+        Create a zone. Update if already exists.
 
         :param Session db_session: database session
         :param ZoneCreate zone: zone
@@ -93,4 +122,6 @@ class Zone(Base):
         zone_db = cls._get_by_id(db_session=db_session, zone_id=zone.zone_id)
         if zone_db is None:
             zone_db = cls._create(db_session=db_session, data=zone)
+        else:
+            zone_db = cls._update(db_session=db_session, zone_db=zone_db, data=zone)
         return zone_db

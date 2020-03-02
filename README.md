@@ -87,5 +87,5 @@ http://127.0.0.1:8000/docs or http://127.0.0.1:8000/redoc
 ## Version 2.0
 * Add PostgreSQL and SQLAlchemy for database and models.
 * The ID of a zone, event or base event are uniques.
-* The info about a zone, event or base event don't change from the first read.
+* The info about a zone, event or base could be update whit info and the same ID.
 * The relation between Event and Zone is MxN.

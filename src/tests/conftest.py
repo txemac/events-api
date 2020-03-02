@@ -9,10 +9,11 @@ from sqlalchemy_utils import drop_database
 from starlette.testclient import TestClient
 
 from app.main import app
-from data import external_api_client
+from data.api_client import feed_api_client
 from data.database import Base
 from data.database import Event
 from data.database import get_db
+from data.database.base_event import BaseEvent
 from data.database.zone import Zone
 from data.schemas import BaseEventCreate
 from data.schemas import EventCreate
@@ -84,7 +85,7 @@ def new_zone_create(data_zone):
 
 @pytest.fixture
 def new_zone(session, new_zone_create):
-    return Zone.get_or_create(
+    return Zone.create_or_update(
         db_session=session,
         zone=new_zone_create,
     )
@@ -119,7 +120,7 @@ def new_event_create(data_event):
 
 @pytest.fixture
 def new_event(session, new_event_create):
-    return Event.get_or_create(
+    return Event.create_or_update(
         db_session=session,
         event=new_event_create,
     )
@@ -270,25 +271,32 @@ def dicts(dict_1, dict_2, dict_3):
 
 @pytest.fixture
 def event_1(dict_1):
-    data = external_api_client._rename_keys(dict_1)
+    data = feed_api_client._rename_keys(dict_1)
     return BaseEventCreate(**data)
 
 
 @pytest.fixture
 def event_2(dict_2):
-    data = external_api_client._rename_keys(dict_2)
+    data = feed_api_client._rename_keys(dict_2)
     return BaseEventCreate(**data)
 
 
 @pytest.fixture
 def event_3(dict_3):
-    data = external_api_client._rename_keys(dict_3)
+    data = feed_api_client._rename_keys(dict_3)
     return BaseEventCreate(**data)
 
 
 @pytest.fixture
 def base_events(event_1, event_2, event_3):
     return [event_1, event_2, event_3]
+
+
+@pytest.fixture
+def scenario(session, event_1, event_2, event_3):
+    BaseEvent.create_or_update(db_session=session, base_event=event_1)
+    BaseEvent.create_or_update(db_session=session, base_event=event_2)
+    BaseEvent.create_or_update(db_session=session, base_event=event_3)
 
 
 @pytest.fixture
