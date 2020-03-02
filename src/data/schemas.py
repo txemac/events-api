@@ -36,3 +36,7 @@ class BaseEventCreate(BaseModel):
     title: str
     organizer_company_id: Optional[int] = None
     event: EventCreate
+
+
+class BaseEventDB(BaseEventCreate):
+    dt_created = datetime
