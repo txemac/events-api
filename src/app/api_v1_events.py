@@ -7,12 +7,12 @@ from starlette.status import HTTP_200_OK
 
 from data import events
 from data import external_api_client
-from data.schemas import BaseEvent
+from data.schemas import BaseEventCreate
 
 api_v1_events = APIRouter()
 
 
-@api_v1_events.get('/', response_model=List[BaseEvent], status_code=HTTP_200_OK)
+@api_v1_events.get('/', response_model=List[BaseEventCreate], status_code=HTTP_200_OK)
 def get_events(
         start_date: date = datetime.min.date(),
         end_date: date = datetime.max.date(),

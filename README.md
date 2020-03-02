@@ -82,4 +82,7 @@ http://127.0.0.1:8000/docs or http://127.0.0.1:8000/redoc
 
 ## Future tasks
 * Pagination in GET response, check https://fastapi-contrib.readthedocs.io/en/latest/fastapi_contrib.html#module-fastapi_contrib.pagination
-* Study the option to create a local database if the events only change 1 time per day.
+
+
+## Version 2.0
+* Add PostgreSQL and SQLAlchemy for database and models.

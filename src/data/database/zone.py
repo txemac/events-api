@@ -8,7 +8,8 @@ from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from data.database import Base
-from data.schemas import Zone
+from data.schemas import ZoneCreate
+from data.schemas import ZoneDB
 
 
 class Zone(Base):
@@ -36,10 +37,10 @@ class Zone(Base):
         self.numbered = numbered
 
     @classmethod
-    def create(
+    def _create(
             cls,
             db_session: Session,
-            data: Zone
+            data: ZoneCreate
     ):
         """
         Create a new zone.
@@ -47,7 +48,7 @@ class Zone(Base):
         :param Session db_session: database session
         :param UserPost data: data
         """
-        zone = Zone(
+        zone = cls(
             zone_id=data.zone_id,
             name=data.name,
             capacity=data.capacity,
@@ -57,3 +58,38 @@ class Zone(Base):
         db_session.add(zone)
         db_session.commit()
         db_session.refresh(zone)
+
+        return cls._get_by_id(db_session=db_session, zone_id=data.zone_id)
+
+    @classmethod
+    def _get_by_id(
+            cls,
+            db_session: Session,
+            zone_id: int
+    ) -> ZoneDB:
+        """
+        Get a zone by ID.
+
+        :param Session db_session: database session
+        :param int zone_id: id
+        :return ZoneDB: zone
+        """
+        return db_session.query(cls).get(zone_id)
+
+    @classmethod
+    def get_or_create(
+            cls,
+            db_session: Session,
+            zone: ZoneCreate,
+    ) -> ZoneDB:
+        """
+        Get a zone. Create if it does not exists.
+
+        :param Session db_session: database session
+        :param ZoneCreate zone: zone
+        :return ZoneDB: zone
+        """
+        zone_db = cls._get_by_id(db_session=db_session, zone_id=zone.zone_id)
+        if zone_db is None:
+            zone_db = cls._create(db_session=db_session, data=zone)
+        return zone_db

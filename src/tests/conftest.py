@@ -12,9 +12,10 @@ from app.main import app
 from data import external_api_client
 from data.database import Base
 from data.database import get_db
-from data.schemas import BaseEvent
-from data.schemas import Event
-from data.schemas import Zone
+from data.database.zone import Zone
+from data.schemas import BaseEventCreate
+from data.schemas import EventCreate
+from data.schemas import ZoneCreate
 
 
 @pytest.fixture
@@ -74,9 +75,17 @@ def data_zone():
 
 
 @pytest.fixture
-def new_zone(data_zone):
-    return Zone(
+def new_zone_create(data_zone):
+    return ZoneCreate(
         **data_zone
+    )
+
+
+@pytest.fixture
+def new_zone(session, new_zone_create):
+    return Zone._create(
+        db_session=session,
+        data=new_zone_create,
     )
 
 
@@ -94,7 +103,7 @@ def data_event(data_zone):
 
 @pytest.fixture
 def new_event(data_event):
-    return Event(
+    return EventCreate(
         **data_event
     )
 
@@ -245,19 +254,19 @@ def dicts(dict_1, dict_2, dict_3):
 @pytest.fixture
 def event_1(dict_1):
     data = external_api_client._rename_keys(dict_1)
-    return BaseEvent(**data)
+    return BaseEventCreate(**data)
 
 
 @pytest.fixture
 def event_2(dict_2):
     data = external_api_client._rename_keys(dict_2)
-    return BaseEvent(**data)
+    return BaseEventCreate(**data)
 
 
 @pytest.fixture
 def event_3(dict_3):
     data = external_api_client._rename_keys(dict_3)
-    return BaseEvent(**data)
+    return BaseEventCreate(**data)
 
 
 @pytest.fixture

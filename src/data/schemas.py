@@ -4,7 +4,7 @@ from typing import List
 from pydantic import BaseModel
 
 
-class Zone(BaseModel):
+class ZoneCreate(BaseModel):
     zone_id: int
     name: str
     capacity: int
@@ -12,22 +12,22 @@ class Zone(BaseModel):
     numbered: bool
 
 
-class ZoneDB(Zone):
+class ZoneDB(ZoneCreate):
     dt_created = datetime
 
 
-class Event(BaseModel):
+class EventCreate(BaseModel):
     event_id: int
     event_date: datetime
     sell_from: datetime
     sell_to: datetime
     sold_out: bool
-    zone: List[Zone]
+    zone: List[ZoneCreate]
 
 
-class BaseEvent(BaseModel):
+class BaseEventCreate(BaseModel):
     base_event_id: int
     sell_mode: str
     title: str
     organizer_company_id: int = None
-    event: Event
+    event: EventCreate

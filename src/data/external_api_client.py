@@ -6,14 +6,14 @@ from typing import List
 import requests
 import xmltodict
 
-from data.schemas import BaseEvent
+from data.schemas import BaseEventCreate
 
 """
 External API client
 """
 
 
-def get_base_events() -> List[BaseEvent]:
+def get_base_events() -> List[BaseEventCreate]:
     """
     Get info about events from external API.
 
@@ -29,14 +29,14 @@ def get_base_events() -> List[BaseEvent]:
 
 def _parse_text_to_base_events(
         dicts: List[Dict]
-) -> List[BaseEvent]:
+) -> List[BaseEventCreate]:
     """
     Parse dictionary to base events model.
 
     :param List dicts: events
     :return List: events
     """
-    return [BaseEvent(**item) for item in dicts]
+    return [BaseEventCreate(**item) for item in dicts]
 
 
 def _xml_to_dict(

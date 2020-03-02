@@ -2,15 +2,15 @@ from datetime import date
 from datetime import datetime
 from typing import List
 
-from data.schemas import BaseEvent
+from data.schemas import BaseEventCreate
 
 
 def get_events(
-        events: List[BaseEvent],
+        events: List[BaseEventCreate],
         start_date: date,
         end_date: date,
         offline: bool
-) -> List[BaseEvent]:
+) -> List[BaseEventCreate]:
     """
     Get event from
 
@@ -29,8 +29,8 @@ def get_events(
 
 
 def filter_offline(
-        events: List[BaseEvent]
-) -> List[BaseEvent]:
+        events: List[BaseEventCreate]
+) -> List[BaseEventCreate]:
     """
     Filter the event NOT offline.
 
@@ -41,10 +41,10 @@ def filter_offline(
 
 
 def filter_date_range(
-        events: List[BaseEvent],
+        events: List[BaseEventCreate],
         start_date: date,
         end_date: date,
-) -> List[BaseEvent]:
+) -> List[BaseEventCreate]:
     """
     Filter event by date range.
 
