@@ -5,8 +5,8 @@ from typing import List
 from fastapi import APIRouter
 from starlette.status import HTTP_200_OK
 
-from data.events import Events
-from data.external_api_client import ExternalAPIClient
+from data import events
+from data import external_api_client
 from data.schemas import BaseEvent
 
 api_v1_events = APIRouter()
@@ -18,5 +18,5 @@ def get_events(
         end_date: date = datetime.max.date(),
         offline: bool = False
 ):
-    events = ExternalAPIClient.get_base_events()
-    return Events.get_events(events=events, start_date=start_date, end_date=end_date, offline=offline)
+    base_events = external_api_client.get_base_events()
+    return events.get_events(events=base_events, start_date=start_date, end_date=end_date, offline=offline)

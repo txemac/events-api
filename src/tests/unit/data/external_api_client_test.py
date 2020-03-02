@@ -1,21 +1,21 @@
-from data.external_api_client import ExternalAPIClient
+from data import external_api_client
 from tests.utils import assert_dicts
 
 
-def test_get_base_events(mocked_requests_get, xml, events):
+def test_get_base_events(mocked_requests_get, xml, base_events):
     mocked_requests_get.return_value.text = xml
-    assert ExternalAPIClient.get_base_events() == events
+    assert external_api_client.get_base_events() == base_events
 
 
-def test__parse_text_to_base_events(xml, events):
-    dicts = ExternalAPIClient._xml_to_dict(xml=xml)['eventList']['output']['base_event']
-    dicts = [ExternalAPIClient._rename_keys(d) for d in dicts]
-    result = ExternalAPIClient._parse_text_to_base_events(dicts=dicts)
-    assert result == events
+def test__parse_text_to_base_events(xml, base_events):
+    dicts = external_api_client._xml_to_dict(xml=xml)['eventList']['output']['base_event']
+    dicts = [external_api_client._rename_keys(d) for d in dicts]
+    result = external_api_client._parse_text_to_base_events(dicts=dicts)
+    assert result == base_events
 
 
 def test__xml_to_dict(xml, dicts):
-    result = ExternalAPIClient._xml_to_dict(xml=xml)['eventList']['output']['base_event']
+    result = external_api_client._xml_to_dict(xml=xml)['eventList']['output']['base_event']
     assert isinstance(result, list)
     assert result == dicts
 
@@ -53,5 +53,5 @@ def test__rename_keys():
             ]
         }
     }
-    result = ExternalAPIClient._rename_keys(data)
+    result = external_api_client._rename_keys(data)
     assert_dicts(result=result, expected=expected)

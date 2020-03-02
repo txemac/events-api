@@ -2,7 +2,7 @@ import pytest
 from starlette.testclient import TestClient
 
 from app.main import app
-from data.external_api_client import ExternalAPIClient
+from data import external_api_client
 from data.schemas import BaseEvent
 from data.schemas import Event
 from data.schemas import Zone
@@ -196,24 +196,24 @@ def dicts(dict_1, dict_2, dict_3):
 
 @pytest.fixture
 def event_1(dict_1):
-    data = ExternalAPIClient._rename_keys(dict_1)
+    data = external_api_client._rename_keys(dict_1)
     return BaseEvent(**data)
 
 
 @pytest.fixture
 def event_2(dict_2):
-    data = ExternalAPIClient._rename_keys(dict_2)
+    data = external_api_client._rename_keys(dict_2)
     return BaseEvent(**data)
 
 
 @pytest.fixture
 def event_3(dict_3):
-    data = ExternalAPIClient._rename_keys(dict_3)
+    data = external_api_client._rename_keys(dict_3)
     return BaseEvent(**data)
 
 
 @pytest.fixture
-def events(event_1, event_2, event_3):
+def base_events(event_1, event_2, event_3):
     return [event_1, event_2, event_3]
 
 
