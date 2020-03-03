@@ -89,3 +89,5 @@ http://127.0.0.1:8000/docs or http://127.0.0.1:8000/redoc
 * The ID of a zone, event or base event are uniques.
 * The info about a zone, event or base could be update whit info and the same ID.
 * The relation between Event and Zone is MxN.
+* New POST endpoint to update feed.
+* New async POST for update feed.
