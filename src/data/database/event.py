@@ -4,7 +4,6 @@ from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import DateTime
 from sqlalchemy import Integer
-from sqlalchemy import func
 from sqlalchemy.orm import Session
 from sqlalchemy.orm import relationship
 
@@ -23,7 +22,7 @@ class Event(Base):
     sell_to = Column(DateTime, nullable=False)
     sold_out = Column(Boolean, nullable=False)
     zone = relationship(Zone, secondary='event_zone')
-    dt_created = Column(DateTime, default=func.now(), nullable=False)
+    dt_created = Column(DateTime, default=datetime.now(), nullable=False)
 
     def __init__(
             self,

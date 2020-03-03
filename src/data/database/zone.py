@@ -6,7 +6,6 @@ from sqlalchemy import DateTime
 from sqlalchemy import Float
 from sqlalchemy import Integer
 from sqlalchemy import String
-from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from data.database import Base
@@ -22,7 +21,7 @@ class Zone(Base):
     capacity = Column(Integer, nullable=False)
     max_price = Column(Float, nullable=False)
     numbered = Column(Boolean, nullable=False)
-    dt_created = Column(DateTime, default=func.now(), nullable=False)
+    dt_created = Column(DateTime, default=datetime.now(), nullable=False)
 
     def __init__(
             self,
