@@ -1,7 +1,7 @@
 from datetime import datetime
 
+from data.database import Event
 from data.database import Zone
-from data.database.event import Event
 from data.schemas import EventCreate
 from data.schemas import ZoneCreate
 

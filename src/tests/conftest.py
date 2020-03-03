@@ -11,10 +11,10 @@ from starlette.testclient import TestClient
 from app.main import app
 from data.api_client import feed_api_client
 from data.database import Base
+from data.database import BaseEvent
 from data.database import Event
+from data.database import Zone
 from data.database import get_db
-from data.database.base_event import BaseEvent
-from data.database.zone import Zone
 from data.schemas import BaseEventCreate
 from data.schemas import EventCreate
 from data.schemas import ZoneCreate

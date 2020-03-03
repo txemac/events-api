@@ -1,4 +1,4 @@
-from data.database.zone import Zone
+from data.database import Zone
 from data.schemas import ZoneCreate
 
 

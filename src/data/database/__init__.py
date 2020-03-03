@@ -23,3 +23,4 @@ def get_db() -> SessionLocal:
 from .zone import Zone
 from .event import Event
 from .event_zone import EventZone
+from .base_event import BaseEvent

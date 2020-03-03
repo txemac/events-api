@@ -1,8 +1,11 @@
 import pytest
 from starlette.status import HTTP_200_OK
+from starlette.status import HTTP_201_CREATED
+
+from data.database import BaseEvent
 
 
-def test_get_events_none(client, scenario, xml):
+def test_get_events_none(client):
     response = client.get(f"/api/v1/events?start_date=1982-04-25&end_date=1982-04-15")
     assert response.status_code == HTTP_200_OK
     assert response.json() == []
@@ -34,3 +37,13 @@ def test_get_events_ok(client, scenario, xml, url, expected):
     response = client.get(url)
     assert response.status_code == HTTP_200_OK
     assert len(response.json()) == expected
+
+
+def test_post_events(client, mocked_requests_get, xml, session):
+    mocked_requests_get.return_value.text = xml
+
+    count1 = session.query(BaseEvent).count()
+    response = client.post(f"/api/v1/events/feed")
+    assert response.status_code == HTTP_201_CREATED
+    count2 = session.query(BaseEvent).count()
+    assert count1 + 3 == count2

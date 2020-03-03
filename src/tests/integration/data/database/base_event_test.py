@@ -2,9 +2,9 @@ from datetime import datetime
 
 import pytest
 
+from data.database import BaseEvent
+from data.database import Event
 from data.database import Zone
-from data.database.base_event import BaseEvent
-from data.database.event import Event
 from data.schemas import BaseEventCreate
 
 
