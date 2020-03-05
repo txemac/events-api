@@ -6,7 +6,6 @@ def test__create(session, data_zone):
     count1 = session.query(Zone).count()
     data = ZoneCreate(**data_zone)
     zone = Zone._create(
-        db_session=session,
         data=data,
     )
     count2 = session.query(Zone).count()
@@ -29,7 +28,6 @@ def test__update(session, new_zone):
         numbered=not new_zone.numbered,
     )
     zone = Zone._update(
-        db_session=session,
         zone_db=new_zone,
         data=new_data,
     )
@@ -44,11 +42,11 @@ def test__update(session, new_zone):
 
 
 def test__get_by_id_ok(session, new_zone):
-    assert Zone._get_by_id(db_session=session, zone_id=new_zone.zone_id) is not None
+    assert Zone._get_by_id(zone_id=new_zone.zone_id) is not None
 
 
 def test__get_by_id_not_exists(session):
-    assert Zone._get_by_id(db_session=session, zone_id=9999) is None
+    assert Zone._get_by_id(zone_id=9999) is None
 
 
 def test_create_or_update_update(session, new_zone):
@@ -61,7 +59,6 @@ def test_create_or_update_update(session, new_zone):
         numbered=not new_zone.numbered,
     )
     zone_db = Zone.create_or_update(
-        db_session=session,
         zone=new_data,
     )
     count2 = session.query(Zone).count()
@@ -78,7 +75,6 @@ def test_create_or_update_update(session, new_zone):
 def test_create_or_update_create(session, new_zone_create):
     count1 = session.query(Zone).count()
     Zone.create_or_update(
-        db_session=session,
         zone=new_zone_create,
     )
     count2 = session.query(Zone).count()

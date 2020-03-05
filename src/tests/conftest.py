@@ -2,67 +2,54 @@ import os
 
 import pytest
 from sqlalchemy import create_engine
-from sqlalchemy.orm import Session
-from sqlalchemy_utils import create_database
-from sqlalchemy_utils import database_exists
-from sqlalchemy_utils import drop_database
-from starlette.testclient import TestClient
 
-from app.main import app
+from data import database as db
 from data.api_client import feed_api_client
-from data.database import Base
 from data.database import BaseEvent
 from data.database import Event
 from data.database import Zone
-from data.database import get_db
 from data.schemas import BaseEventCreate
 from data.schemas import EventCreate
 from data.schemas import ZoneCreate
+from main import create_app
 
 
 @pytest.fixture
-def client():
-    with TestClient(app) as client:
-        yield client
+def app():
+    app = create_app()
+    return app
 
 
 url = f'{os.getenv("DATABASE_URL")}_test'
 _db_conn = create_engine(url)
 
 
-def get_test_db_conn():
-    assert _db_conn is not None
-    return _db_conn
+@pytest.fixture
+def database(app):
+    db.app = app
+    yield db
 
 
-def get_test_db():
-    sess = Session(bind=_db_conn)
+@pytest.fixture(scope='function')
+def session(database, request):
+    connection = database.engine.connect()
+    transaction = connection.begin()
 
-    try:
-        yield sess
-    finally:
-        sess.close()
+    from sqlalchemy.orm import scoped_session
+    from sqlalchemy.orm import sessionmaker
 
+    session_factory = sessionmaker(bind=database.engine)
+    db_session = scoped_session(session_factory)
+    database.session = db_session
 
-@pytest.fixture(scope="session", autouse=True)
-def database():
-    if database_exists(url):
-        drop_database(url)
-    create_database(url)
-    Base.metadata.create_all(_db_conn)
-    app.dependency_overrides[get_db] = get_test_db
-    yield
-    drop_database(url)
+    def teardown():
+        transaction.rollback()
+        connection.close()
+        db_session.remove()
+        session_factory.close_all()
 
-
-@pytest.yield_fixture
-def session():
-    db_session = Session(bind=_db_conn)
-
-    yield db_session
-    for tbl in reversed(Base.metadata.sorted_tables):
-        _db_conn.execute(tbl.delete())
-    db_session.close()
+    request.addfinalizer(teardown)
+    return db_session
 
 
 @pytest.fixture
@@ -86,7 +73,6 @@ def new_zone_create(data_zone):
 @pytest.fixture
 def new_zone(session, new_zone_create):
     return Zone.create_or_update(
-        db_session=session,
         zone=new_zone_create,
     )
 
@@ -121,7 +107,6 @@ def new_event_create(data_event):
 @pytest.fixture
 def new_event(session, new_event_create):
     return Event.create_or_update(
-        db_session=session,
         event=new_event_create,
     )
 
@@ -294,9 +279,9 @@ def base_events(event_1, event_2, event_3):
 
 @pytest.fixture
 def scenario(session, event_1, event_2, event_3):
-    BaseEvent.create_or_update(db_session=session, base_event=event_1)
-    BaseEvent.create_or_update(db_session=session, base_event=event_2)
-    BaseEvent.create_or_update(db_session=session, base_event=event_3)
+    BaseEvent.create_or_update(base_event=event_1)
+    BaseEvent.create_or_update(base_event=event_2)
+    BaseEvent.create_or_update(base_event=event_3)
 
 
 @pytest.fixture

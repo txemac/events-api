@@ -9,9 +9,9 @@ from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import String
 from sqlalchemy import func
-from sqlalchemy.orm import Session
 from sqlalchemy.orm import relationship
 
+from data import database
 from data.database import Base
 from data.database import Event
 from data.schemas import BaseEventCreate
@@ -47,93 +47,82 @@ class BaseEvent(Base):
     @classmethod
     def _create(
             cls,
-            db_session: Session,
             data: BaseEventCreate
     ) -> BaseEventDB:
         """
         Create a new base event.
 
-        :param Session db_session: database session
         :param BaseEventCreate data: data
         """
         base_event = cls(
             base_event_id=data.base_event_id,
-            event=Event.create_or_update(db_session=db_session, event=data.event),
+            event=Event.create_or_update(event=data.event),
             sell_mode=data.sell_mode,
             title=data.title,
             organizer_company_id=data.organizer_company_id,
         )
-        db_session.add(base_event)
-        db_session.commit()
-        db_session.refresh(base_event)
+        database.save(base_event)
 
         return base_event
 
     @classmethod
     def _update(
             cls,
-            db_session: Session,
             base_event_db: BaseEventDB,
             data: BaseEventCreate,
     ) -> BaseEventDB:
         """
         Create a new zone.
 
-        :param Session db_session: database session
         :param BaseEventDB base_event_db: data at DB
         :param BaseEventCreate data: data
         """
         base_event_db.base_event_id = data.base_event_id
-        base_event_db.event = Event.create_or_update(db_session=db_session, event=data.event)
+        base_event_db.event = Event.create_or_update(event=data.event)
         base_event_db.sell_mode = data.sell_mode
         base_event_db.title = data.title
         base_event_db.organizer_company_id = data.organizer_company_id
         base_event_db.dt_created = datetime.now()
 
-        db_session.commit()
-        db_session.refresh(base_event_db)
+        database.db_session.commit()
+        database.db_session.refresh(base_event_db)
 
         return base_event_db
 
     @classmethod
     def _get_by_id(
             cls,
-            db_session: Session,
             base_event_id: int
     ) -> BaseEventDB:
         """
         Get a base event by ID.
 
-        :param Session db_session: database session
         :param int base_event_id: id
         :return BaseEventDB: zone
         """
-        return db_session.query(cls).get(base_event_id)
+        return database.db_session.query(cls).get(base_event_id)
 
     @classmethod
     def create_or_update(
             cls,
-            db_session: Session,
             base_event: BaseEventCreate
     ) -> BaseEventDB:
         """
         Create a new zone. Update info it already exists.
 
-        :param Session db_session: database session
         :param BaseEventCreate base_event: base event
         """
-        base_event_db = cls._get_by_id(db_session=db_session, base_event_id=base_event.base_event_id)
+        base_event_db = cls._get_by_id(base_event_id=base_event.base_event_id)
 
         if base_event_db is None:
-            base_event_db = cls._create(db_session=db_session, data=base_event)
+            base_event_db = cls._create(data=base_event)
         else:
-            base_event_db = cls._update(db_session=db_session, base_event_db=base_event_db, data=base_event)
+            base_event_db = cls._update(base_event_db=base_event_db, data=base_event)
 
         return base_event_db
 
     @staticmethod
     def get_events(
-            db_session: Session,
             start_date: Optional[date] = None,
             end_date: Optional[date] = None,
             offline: Optional[bool] = False,
@@ -141,13 +130,12 @@ class BaseEvent(Base):
         """
         Get event from database.
 
-        :param Session db_session: database session
         :param date start_date: start date
         :param date end_date: end date
         :param bool offline: filter offline
         :return List: base events
         """
-        result = db_session.query(BaseEvent)
+        result = database.db_session.query(BaseEvent)
 
         if start_date is not None:
             start_datetime = datetime.combine(start_date, datetime.min.time())

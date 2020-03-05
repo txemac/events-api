@@ -6,8 +6,8 @@ from sqlalchemy import DateTime
 from sqlalchemy import Float
 from sqlalchemy import Integer
 from sqlalchemy import String
-from sqlalchemy.orm import Session
 
+from data import database
 from data.database import Base
 from data.schemas import ZoneCreate
 from data.schemas import ZoneDB
@@ -40,13 +40,11 @@ class Zone(Base):
     @classmethod
     def _create(
             cls,
-            db_session: Session,
             data: ZoneCreate
     ) -> ZoneDB:
         """
         Create a new zone.
 
-        :param Session db_session: database session
         :param Zone data: data
         :return ZoneDB: zone
         """
@@ -57,23 +55,19 @@ class Zone(Base):
             max_price=data.max_price,
             numbered=data.numbered,
         )
-        db_session.add(zone)
-        db_session.commit()
-        db_session.refresh(zone)
+        database.save(zone)
 
         return zone
 
     @classmethod
     def _update(
             cls,
-            db_session: Session,
             zone_db: ZoneDB,
             data: ZoneCreate,
     ) -> ZoneDB:
         """
         Create a new zone.
 
-        :param Session db_session: database session
         :param zone_db: data at DB
         :param Zone data: data
         :return ZoneDB: zone
@@ -85,42 +79,38 @@ class Zone(Base):
         zone_db.numbered = data.numbered
         zone_db.dt_created = datetime.now()
 
-        db_session.commit()
-        db_session.refresh(zone_db)
+        database.db_session.commit()
+        database.db_session.refresh(zone_db)
 
         return zone_db
 
     @classmethod
     def _get_by_id(
             cls,
-            db_session: Session,
             zone_id: int
     ) -> ZoneDB:
         """
         Get a zone by ID.
 
-        :param Session db_session: database session
         :param int zone_id: id
         :return ZoneDB: zone
         """
-        return db_session.query(cls).get(zone_id)
+        return database.db_session.query(cls).get(zone_id)
 
     @classmethod
     def create_or_update(
             cls,
-            db_session: Session,
             zone: ZoneCreate,
     ) -> ZoneDB:
         """
         Create a zone. Update if already exists.
 
-        :param Session db_session: database session
         :param ZoneCreate zone: zone
         :return ZoneDB: zone
         """
-        zone_db = cls._get_by_id(db_session=db_session, zone_id=zone.zone_id)
+        zone_db = cls._get_by_id(zone_id=zone.zone_id)
         if zone_db is None:
-            zone_db = cls._create(db_session=db_session, data=zone)
+            zone_db = cls._create(data=zone)
         else:
-            zone_db = cls._update(db_session=db_session, zone_db=zone_db, data=zone)
+            zone_db = cls._update(zone_db=zone_db, data=zone)
         return zone_db

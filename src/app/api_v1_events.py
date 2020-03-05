@@ -1,50 +1,29 @@
-from datetime import date
-from typing import List
-from typing import Optional
+from datetime import datetime
 
-from fastapi import APIRouter
-from fastapi import Depends
-from sqlalchemy.orm import Session
-from starlette.background import BackgroundTasks
-from starlette.status import HTTP_200_OK
-from starlette.status import HTTP_201_CREATED
+from flask import Blueprint
+from flask import request
 
-from app import tasks
-from data.api_client import feed_api_client
+from app import responder
 from data.database import BaseEvent
-from data.database import get_db
-from data.schemas import BaseEventDB
+from data.serializer.base_event import BaseEventSerializer
 
-api_v1_events = APIRouter()
-
-
-@api_v1_events.get('/', response_model=List[BaseEventDB], status_code=HTTP_200_OK)
-def get_events(
-        *,
-        db_session: Session = Depends(get_db),
-        start_date: Optional[date] = None,
-        end_date: Optional[date] = None,
-        offline: Optional[bool] = False,
-):
-    return BaseEvent.get_events(db_session=db_session, start_date=start_date, end_date=end_date, offline=offline)
+api_v1_events = Blueprint('api_v1_events', __name__, url_prefix='/api/v1/events')
 
 
-@api_v1_events.post('/feed', status_code=HTTP_201_CREATED)
-def post_events(
-        *,
-        db_session: Session = Depends(get_db),
-):
-    for base_event in feed_api_client.get_feed():
-        BaseEvent.create_or_update(db_session=db_session, base_event=base_event)
+@api_v1_events.route('', methods=['GET'])
+def get_events():
+    args = request.args
+    start_date = args.get('start_date')
+    if start_date is not None:
+        start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+    end_date = args.get('end_date')
+    if end_date is not None:
+        end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
 
-    return dict(status='Feed updated.')
+    offline = True if args.get('offline') == 'true' else False
 
+    result = BaseEvent.get_events(start_date=start_date, end_date=end_date, offline=offline)
 
-@api_v1_events.post('/feed_async')
-async def post_events_async(
-        *,
-        db_session: Session = Depends(get_db),
-        background_tasks: BackgroundTasks
-):
-    background_tasks.add_task(tasks.job_read_feed, db_session)
-    return dict(status='Feed updated.')
+    return responder.generate_get(
+        data=[BaseEventSerializer.serialize(base_event=base_event) for base_event in result]
+    )

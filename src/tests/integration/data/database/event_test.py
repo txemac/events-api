@@ -11,7 +11,6 @@ def test__create(session, data_event):
     count_zone_1 = session.query(Zone).count()
     data = EventCreate(**data_event)
     event = Event._create(
-        db_session=session,
         data=data,
     )
     count_event_2 = session.query(Event).count()
@@ -41,7 +40,7 @@ def test__update(session, new_event):
         max_price=new_event.zone[0].max_price + 1,
         numbered=not new_event.zone[0].numbered,
     )
-    Zone.create_or_update(db_session=session, zone=update_zone_data)
+    Zone.create_or_update(zone=update_zone_data)
     new_data = EventCreate(
         event_id=new_event.event_id,
         event_date='2111-11-11T11:11:11',
@@ -51,7 +50,6 @@ def test__update(session, new_event):
         zone=new_event.zone,
     )
     event = Event._update(
-        db_session=session,
         event_db=new_event,
         data=new_data,
     )
@@ -73,11 +71,11 @@ def test__update(session, new_event):
 
 
 def test__get_by_id_ok(session, new_event):
-    assert Event._get_by_id(db_session=session, event_id=new_event.event_id) is not None
+    assert Event._get_by_id(event_id=new_event.event_id) is not None
 
 
 def test__get_by_id_not_exists(session):
-    assert Event._get_by_id(db_session=session, event_id=9999) is None
+    assert Event._get_by_id(event_id=9999) is None
 
 
 def test_create_or_update_update(session, new_event):
@@ -89,7 +87,7 @@ def test_create_or_update_update(session, new_event):
         max_price=new_event.zone[0].max_price + 1,
         numbered=not new_event.zone[0].numbered,
     )
-    Zone.create_or_update(db_session=session, zone=update_zone_data)
+    Zone.create_or_update(zone=update_zone_data)
     new_data = EventCreate(
         event_id=new_event.event_id,
         event_date='2111-11-11T11:11:11',
@@ -99,7 +97,6 @@ def test_create_or_update_update(session, new_event):
         zone=new_event.zone,
     )
     event_db = Event.create_or_update(
-        db_session=session,
         event=new_data,
     )
     count2 = session.query(Event).count()
@@ -121,7 +118,6 @@ def test_create_or_update_update(session, new_event):
 def test_get_or_create_create(session, new_event_create):
     count1 = session.query(Event).count()
     Event.create_or_update(
-        db_session=session,
         event=new_event_create,
     )
     count2 = session.query(Event).count()

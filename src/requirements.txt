@@ -1,4 +1,4 @@
-fastapi==0.52.0
+Flask==1.1.1
 uvicorn==0.11.3
 psycopg2-binary==2.8.4
 requests==2.23.0
@@ -8,6 +8,7 @@ xmltodict==0.12.0
 
 # dev
 pytest==5.3.5
+pytest-flask==1.0.0
 pytest-mock==2.0.0
 pytest-pycodestyle==2.0.0
 sqlalchemy-utils==0.36.1

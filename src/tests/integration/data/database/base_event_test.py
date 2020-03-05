@@ -14,13 +14,12 @@ def test_create(session, data_base_event):
     count_zone_1 = session.query(Zone).count()
     data = BaseEventCreate(**data_base_event)
     BaseEvent.create_or_update(
-        db_session=session,
         base_event=data,
     )
     count_base_event_2 = session.query(BaseEvent).count()
     count_event_2 = session.query(Event).count()
     count_zone_2 = session.query(Zone).count()
-    assert count_base_event_1 + 1 == count_base_event_2
+    assert count_base_event_1 == count_base_event_2
     assert count_event_1 + 1 == count_event_2
     assert count_zone_1 + 1 == count_zone_2
 
@@ -42,14 +41,14 @@ def test_create(session, data_base_event):
 
 
 def test_get_events_empty(session):
-    assert BaseEvent.get_events(db_session=session) == []
+    assert BaseEvent.get_events() == []
 
 
 @pytest.mark.parametrize('offline, expected',
                          [(True, 3),
                           (False, 2)])
 def test_get_events_offline(session, scenario, offline, expected):
-    assert len(BaseEvent.get_events(db_session=session, offline=offline)) == expected
+    assert len(BaseEvent.get_events(offline=offline)) == expected
 
 
 @pytest.mark.parametrize('start_date, end_date, expected',
@@ -62,4 +61,4 @@ def test_get_events_offline(session, scenario, offline, expected):
 def test_get_events_date_range(session, scenario, start_date, end_date, expected):
     start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
     end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
-    assert len(BaseEvent.get_events(db_session=session, start_date=start_date, end_date=end_date)) == expected
+    assert len(BaseEvent.get_events(start_date=start_date, end_date=end_date)) == expected

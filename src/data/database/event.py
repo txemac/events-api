@@ -4,9 +4,9 @@ from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import DateTime
 from sqlalchemy import Integer
-from sqlalchemy.orm import Session
 from sqlalchemy.orm import relationship
 
+from data import database
 from data.database import Base
 from data.database import Zone
 from data.schemas import EventCreate
@@ -43,13 +43,11 @@ class Event(Base):
     @classmethod
     def _create(
             cls,
-            db_session: Session,
             data: EventCreate
     ) -> EventDB:
         """
         Create a new event.
 
-        :param Session db_session: database session
         :param EventCreate data: data
         """
         event = cls(
@@ -58,25 +56,21 @@ class Event(Base):
             sell_from=data.sell_from,
             sell_to=data.sell_to,
             sold_out=data.sold_out,
-            zone=[Zone.create_or_update(db_session=db_session, zone=z) for z in data.zone],
+            zone=[Zone.create_or_update(zone=z) for z in data.zone],
         )
-        db_session.add(event)
-        db_session.commit()
-        db_session.refresh(event)
+        database.save(event)
 
         return event
 
     @classmethod
     def _update(
             cls,
-            db_session: Session,
             event_db: EventDB,
             data: EventCreate,
     ) -> EventDB:
         """
         Update an event.
 
-        :param Session db_session: database session
         :param EventDB event_db: event from DB
         :param EventCreate data: data
         """
@@ -85,45 +79,41 @@ class Event(Base):
         event_db.sell_from = data.sell_from
         event_db.sell_to = data.sell_to
         event_db.sold_out = data.sold_out
-        event_db.zone = [Zone.create_or_update(db_session=db_session, zone=z) for z in data.zone]
+        event_db.zone = [Zone.create_or_update(zone=z) for z in data.zone]
         event_db.dt_created = datetime.now()
 
-        db_session.commit()
-        db_session.refresh(event_db)
+        database.db_session.commit()
+        database.db_session.refresh(event_db)
 
         return event_db
 
     @classmethod
     def _get_by_id(
             cls,
-            db_session: Session,
             event_id: int
     ) -> EventDB:
         """
         Get an event by ID.
 
-        :param Session db_session: database session
         :param int event_id: id
         :return EventDB: event
         """
-        return db_session.query(cls).get(event_id)
+        return database.db_session.query(cls).get(event_id)
 
     @classmethod
     def create_or_update(
             cls,
-            db_session: Session,
             event: EventCreate,
     ) -> EventDB:
         """
         Create an event. Update if already exists.
 
-        :param Session db_session: database session
         :param EventCreate event: event
         :return EventDB: event
         """
-        event_db = cls._get_by_id(db_session=db_session, event_id=event.event_id)
+        event_db = cls._get_by_id(event_id=event.event_id)
         if event_db is None:
-            event_db = cls._create(db_session=db_session, data=event)
+            event_db = cls._create(data=event)
         else:
-            event_db = cls._update(db_session=db_session, event_db=event_db, data=event)
+            event_db = cls._update(event_db=event_db, data=event)
         return event_db
