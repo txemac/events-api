@@ -22,7 +22,7 @@ def create_app() -> FastAPI:
     # scheduler
     scheduler = BackgroundScheduler()
     scheduler.configure(timezone=utc)
-    scheduler.add_job(job_read_feed, 'interval', minites=5)
+    scheduler.add_job(job_read_feed, 'interval', minutes=5)
     scheduler.start()
 
     return api
