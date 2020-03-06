@@ -5,6 +5,7 @@ from sqlalchemy import Column
 from sqlalchemy import DateTime
 from sqlalchemy import Integer
 from sqlalchemy.orm import Session
+from sqlalchemy.orm import backref
 from sqlalchemy.orm import relationship
 
 from data.database import Base
@@ -21,7 +22,7 @@ class Event(Base):
     sell_from = Column(DateTime, nullable=False)
     sell_to = Column(DateTime, nullable=False)
     sold_out = Column(Boolean, nullable=False)
-    zone = relationship(Zone, secondary='event_zone')
+    zone = relationship(Zone, secondary='event_zone', backref=backref('event_zone', lazy='dynamic'))
     dt_created = Column(DateTime, default=datetime.now(), nullable=False)
 
     def __init__(
@@ -85,10 +86,12 @@ class Event(Base):
         event_db.sell_from = data.sell_from
         event_db.sell_to = data.sell_to
         event_db.sold_out = data.sold_out
-        event_db.zone = [Zone.create_or_update(db_session=db_session, zone=z) for z in data.zone]
         event_db.dt_created = datetime.now()
 
-        db_session.commit()
+        event_db.zone.clear()
+        event_db.zone = [Zone.create_or_update(db_session=db_session, zone=z) for z in data.zone]
+
+        db_session.add(event_db)
         db_session.refresh(event_db)
 
         return event_db
